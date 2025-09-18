@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Polling Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/demo.css">
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-4">Real-Time Polling Demo</h1>
+                <div class="alert alert-info">
+                    <strong>Instructions:</strong> Select a poll to view real-time results. When someone votes, the results will update automatically.
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <h3>Available Polls</h3>
+                <div class="list-group" id="polls-list">
+                    <% if (polls.length === 0) { %>
+                        <div class="alert alert-warning">
+                            No published polls available. Create some polls using the API first!
+                        </div>
+                    <% } else { %>
+                        <% polls.forEach(function(poll) { %>
+                            <a href="#" class="list-group-item list-group-item-action poll-item" data-poll-id="<%= poll.id %>">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1"><%= poll.question %></h5>
+                                    <small>by <%= poll.creator.name %></small>
+                                </div>
+                                <p class="mb-1"><%= poll.options.length %> options</p>
+                                <small>Total votes: <span class="total-votes"><%= poll.options.reduce((sum, opt) => sum + opt._count.votes, 0) %></span></small>
+                            </a>
+                        <% }); %>
+                    <% } %>
+                </div>
+
+                <div class="mt-4">
+                    <h4>Connection Status</h4>
+                    <div class="alert alert-secondary" id="connection-status">
+                        <span class="badge bg-warning">Disconnected</span>
+                        <span id="status-text">Not connected</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div id="poll-results" class="d-none">
+                    <h3>Poll Results</h3>
+                    <div id="poll-question" class="mb-3"></div>
+                    <div id="results-container"></div>
+                    <div class="mt-3">
+                        <small class="text-muted">Results update in real-time as votes are cast</small>
+                    </div>
+                </div>
+
+                <div id="no-poll-selected" class="text-center mt-5">
+                    <h4 class="text-muted">Select a poll to view real-time results</h4>
+                    <p class="text-muted">Click on a poll from the left panel to start monitoring live votes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <h4>API Testing</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Quick Vote Test</h5>
+                        <div class="mb-3">
+                            <label for="user-id" class="form-label">User ID:</label>
+                            <input type="text" class="form-control" id="user-id" placeholder="Enter user ID">
+                        </div>
+                        <div class="mb-3">
+                            <label for="poll-option-id" class="form-label">Poll Option ID:</label>
+                            <input type="text" class="form-control" id="poll-option-id" placeholder="Enter poll option ID">
+                        </div>
+                        <button class="btn btn-primary" onclick="submitVote()">Submit Vote</button>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>API Endpoints</h5>
+                        <ul class="list-unstyled">
+                            <li><strong>GET</strong> <code>/api/polls</code> - Get all polls</li>
+                            <li><strong>POST</strong> <code>/api/users</code> - Create user</li>
+                            <li><strong>POST</strong> <code>/api/polls</code> - Create poll</li>
+                            <li><strong>POST</strong> <code>/api/votes</code> - Submit vote</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/demo.js"></script>
+</body>
+</html>
